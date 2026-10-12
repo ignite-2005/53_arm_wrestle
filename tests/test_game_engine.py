@@ -76,12 +76,17 @@ class GameEngineTests(unittest.TestCase):
 
         rendered_text = []
 
-        def capture_render(text, antialias, color):
-            rendered_text.append(text)
-            return pygame.Surface((1, 1))
+        class FakeFont:
+            def render(self, text, antialias, color):
+                rendered_text.append(text)
+                return pygame.Surface((1, 1))
 
-        with patch.object(self.game.font_small, "render", side_effect=capture_render):
+        original_font = self.game.font_small
+        self.game.font_small = FakeFont()
+        try:
             self.game.render(surface)
+        finally:
+            self.game.font_small = original_font
 
         self.assertIn("EXHAUSTED - wait for stamina to recover", rendered_text)
         self.assertNotIn("COUNTER WINDOW: press RIGHT now!", rendered_text)
