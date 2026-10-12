@@ -68,6 +68,24 @@ class GameEngineTests(unittest.TestCase):
         self.key(pygame.K_LEFT)
         self.assertLess(self.game.arm_position, 0.0)
 
+    def test_counter_window_message_is_hidden_while_exhausted(self):
+        self.game.ai_phase = "COOLDOWN"
+        self.game.counter_window_remaining = 0.5
+        self.game.stamina = self.game.EXHAUSTED_THRESHOLD
+        surface = pygame.Surface((600, 620))
+
+        rendered_text = []
+
+        def capture_render(text, antialias, color):
+            rendered_text.append(text)
+            return pygame.Surface((1, 1))
+
+        with patch.object(self.game.font_small, "render", side_effect=capture_render):
+            self.game.render(surface)
+
+        self.assertIn("EXHAUSTED - wait for stamina to recover", rendered_text)
+        self.assertNotIn("COUNTER WINDOW: press RIGHT now!", rendered_text)
+
     def test_invalid_key_does_not_change_game_state(self):
         self.key(pygame.K_SPACE)
         self.assertEqual(self.game.arm_position, 0.0)
