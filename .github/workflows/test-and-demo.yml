@@ -1,0 +1,54 @@
+name: Test game and generate demo videos
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "main.py"
+      - "game/**"
+      - "tests/**"
+      - "tools/**"
+      - "requirements.txt"
+      - ".github/workflows/test-and-demo.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test-and-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      - name: Run unit tests
+        env:
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
+        run: python -m unittest discover -s tests -v
+      - name: Render 10-second gameplay clips
+        env:
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
+        run: python tools/render_demo_videos.py
+      - name: Commit generated demo videos
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add videos/before_bug_demo.mp4 videos/after_fix_demo.mp4
+          if ! git diff --cached --quiet; then
+            git commit -m "Add 10-second before-and-after gameplay demos"
+            git push
+          else
+            echo "Demo videos are already up to date."
+          fi

@@ -12,9 +12,7 @@ def main():
     pygame.display.set_caption("Arm Wrestle Showdown")
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
-
     engine = GameEngine(SCREEN_WIDTH, SCREEN_HEIGHT)
-
     running = True
     while running:
         for event in pygame.event.get():
@@ -22,12 +20,10 @@ def main():
                 running = False
             else:
                 engine.handle_event(event)
-
-        engine.update()
+        dt = clock.tick(FPS) / 1000.0
+        engine.update(dt)
         engine.render(screen)
         pygame.display.flip()
-        clock.tick(FPS)
-
     pygame.quit()
     sys.exit()
 
