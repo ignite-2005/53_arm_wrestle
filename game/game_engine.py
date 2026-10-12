@@ -147,7 +147,7 @@ class GameEngine:
 
         if self.counter_bonus_remaining > 0:
             info, info_color = "COUNTER-SURGE BONUS! 2x push + fast recovery", (100, 220, 255)
-        elif self.counter_window_remaining > 0:
+        elif self.counter_window_remaining > 0 and not self.exhausted:
             info, info_color = "COUNTER WINDOW: press RIGHT now!", (255, 215, 90)
         elif self.exhausted:
             info, info_color = "EXHAUSTED - wait for stamina to recover", (255, 90, 90)
