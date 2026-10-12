@@ -15,6 +15,9 @@ from pathlib import Path
 os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
 
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
 import pygame
 from game.game_engine import GameEngine
 from tools.original_game_engine import GameEngine as OriginalGameEngine
@@ -23,9 +26,7 @@ WIDTH, HEIGHT = 600, 620
 VIDEO_FPS = 20
 SECONDS = 10
 SIM_FPS = 60
-ROOT = Path(__file__).resolve().parents[1]
 VIDEO_DIR = ROOT / "videos"
-sys.path.insert(0, str(ROOT))
 
 
 def run_demo(engine, output_path: Path, fixed: bool) -> None:
