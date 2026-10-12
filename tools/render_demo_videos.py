@@ -29,6 +29,28 @@ SIM_FPS = 60
 VIDEO_DIR = ROOT / "videos"
 
 
+
+def add_demo_label(screen, fixed: bool, elapsed: float) -> None:
+    """Make the behavior being demonstrated explicit in the 10-second clip."""
+    panel = pygame.Rect(10, 544, WIDTH - 20, 66)
+    bg = (18, 48, 36) if fixed else (64, 24, 28)
+    border = (76, 220, 140) if fixed else (255, 100, 95)
+    pygame.draw.rect(screen, bg, panel, border_radius=8)
+    pygame.draw.rect(screen, border, panel, width=2, border_radius=8)
+    title_font = pygame.font.SysFont(None, 23)
+    subtitle_font = pygame.font.SysFont(None, 18)
+    if fixed:
+        title = "AFTER FIX: ARROWS PUSH TOWARD PLAYER"
+        subtitle = "AI SURGE / COOLDOWN  |  EXHAUSTION WARNING  |  COUNTER-SURGE BONUS"
+    else:
+        title = "BEFORE FIX: INVERTED PUSH BUG"
+        subtitle = "LEFT or RIGHT adds force toward COMPUTER — player input helps the opponent"
+    title_surf = title_font.render(title, True, border)
+    sub_surf = subtitle_font.render(subtitle, True, (245, 245, 245))
+    screen.blit(title_surf, (panel.x + 12, panel.y + 10))
+    screen.blit(sub_surf, (panel.x + 12, panel.y + 38))
+
+
 def run_demo(engine, output_path: Path, fixed: bool) -> None:
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     total_frames = VIDEO_FPS * SECONDS
@@ -74,6 +96,7 @@ def run_demo(engine, output_path: Path, fixed: bool) -> None:
                 tick += 1
 
             engine.render(screen)
+            add_demo_label(screen, fixed=fixed, elapsed=(_ + 1) / VIDEO_FPS)
             frame_bytes = pygame.image.tostring(screen, "RGB")
             assert process.stdin is not None
             process.stdin.write(frame_bytes)
